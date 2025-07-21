@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: minibanking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresql
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    image: openjdk:17-jdk
+    working_dir: /app
+    volumes:
+      - ./mini-banking-backend:/app
+    command: ["./mvnw", "spring-boot:run"]
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    depends_on:
+      - db
+
+  frontend:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./mini-banking-frontend:/app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  db_data: 
